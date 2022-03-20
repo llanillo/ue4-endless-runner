@@ -2,6 +2,8 @@
 
 
 #include "Tiles/BasicFloorTile.h"
+
+#include "Collectables/CoinItem.h"
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GamePlayStatics.h"
@@ -51,30 +53,46 @@ void ABasicFloorTile::BeginPlay()
 
 void ABasicFloorTile::SpawnItems()
 {
-	if(IsValid(SmallObstacleClass) && IsValid(BigObstacleClass))
+	if(IsValid(SmallObstacleClass) && IsValid(BigObstacleClass) && IsValid(CoinItemClass))
 	{
-		SpawnLaneItem(CenterLane);
-		SpawnLaneItem(RightLane);
-		SpawnLaneItem(LeftLane);
+		int32 NumBigs = 0;
+		SpawnLaneItem(CenterLane, NumBigs);
+		SpawnLaneItem(RightLane, NumBigs);
+		SpawnLaneItem(LeftLane, NumBigs);
 	}
 }
 
-void ABasicFloorTile::SpawnLaneItem(const UArrowComponent* Lane) const
+void ABasicFloorTile::SpawnLaneItem(const UArrowComponent* Lane, int32& NumBigs) const
 {
 	const float RandValue = FMath::FRandRange(0.0f, 1.0f);
 	const FAttachmentTransformRules AttachmentTransformRules (EAttachmentRule::KeepRelative, false);
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	
-	
-	if(UKismetMathLibrary::InRange_FloatFloat(RandValue, 0.5f, 0.75f, true, true))
+	if(UKismetMathLibrary::InRange_FloatFloat(RandValue, SpawnPercent1, SpawnPercent2, true, true))
 	{
-		AWallObstacle* WallObstacle = GetWorld()->SpawnActor<AWallObstacle>(SmallObstacleClass, Lane->GetComponentTransform(), SpawnParams);
-		WallObstacle->AttachToComponent(RootComponent, AttachmentTransformRules); // Check if works
+		AWallObstacle* SmallWallObstacle = GetWorld()->SpawnActor<AWallObstacle>(SmallObstacleClass, Lane->GetComponentTransform(), SpawnParams);
+		SmallWallObstacle->AttachToComponent(RootComponent, AttachmentTransformRules); // Check if works
 	}
-	else if(UKismetMathLibrary::InRange_FloatFloat(RandValue, 0.75f, 1.0f, true, true))
+	else if(UKismetMathLibrary::InRange_FloatFloat(RandValue, SpawnPercent2, SpawnPercent3, true, true))
 	{
-		GetWorld()->SpawnActor<AWallObstacle>(BigObstacleClass, Lane->GetComponentTransform(), SpawnParams);
+		if(NumBigs <= 2)
+		{
+			AWallObstacle* BigWallObstacle = GetWorld()->SpawnActor<AWallObstacle>(BigObstacleClass, Lane->GetComponentTransform(), SpawnParams);
+
+			if(BigWallObstacle)
+			{
+				NumBigs++;	
+			}
+			else
+			{
+				AWallObstacle* SmallWallObstacle = GetWorld()->SpawnActor<AWallObstacle>(SmallObstacleClass, Lane->GetComponentTransform(), SpawnParams);
+			}
+		}
+	}
+	else if(UKismetMathLibrary::InRange_FloatFloat(RandValue, SpawnPercent3, 1.0f, true, true))
+	{
+		ACoinItem* CoinItem = GetWorld()->SpawnActor<ACoinItem>(CoinItemClass, Lane->GetComponentTransform(), SpawnParams);
 	}
 }
 
@@ -85,7 +103,6 @@ void ABasicFloorTile::OnTriggerBoxOverlap(UPrimitiveComponent* OverlappedCompone
 	if (MainCharacter)
 	{
 		MainGameMode->AddFloorTile(true);
-
 		GetWorldTimerManager().SetTimer(DestroyHandle, this, &ABasicFloorTile::DestroyFloorTile, 2.0f, false);
 	}
 }

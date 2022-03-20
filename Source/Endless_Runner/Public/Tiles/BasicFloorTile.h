@@ -7,6 +7,7 @@
 #include "Components/ArrowComponent.h"
 #include "BasicFloorTile.generated.h"
 
+class ACoinItem;
 class USceneComponent;
 class UBoxComponent;
 class AWallObstacle;
@@ -25,6 +26,9 @@ class ENDLESS_RUNNER_API ABasicFloorTile : public AActor
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category = "Config", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AWallObstacle> BigObstacleClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config", meta=(AllowPrivateAccess = "true"))
+	TSubclassOf<ACoinItem> CoinItemClass;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USceneComponent* SceneComponent;
@@ -50,8 +54,17 @@ class ENDLESS_RUNNER_API ABasicFloorTile : public AActor
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Timer", meta = (AllowPrivateAccess = "true"))
 	FTimerHandle DestroyHandle;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config", meta = (AllowPrivateAccess = "true"))
+	float SpawnPercent1 = 0.1f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config", meta = (AllowPrivateAccess = "true"))
+	float SpawnPercent2 = 0.3f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config", meta = (AllowPrivateAccess = "true"))
+	float SpawnPercent3 = 0.5f;
+	
 	UFUNCTION(BlueprintCallable)
-	void SpawnLaneItem(const UArrowComponent* Lane) const;
+	void SpawnLaneItem(const UArrowComponent* Lane, int32& NumBigs) const;
 
 	UFUNCTION(BlueprintCallable)
 	void DestroyFloorTile();

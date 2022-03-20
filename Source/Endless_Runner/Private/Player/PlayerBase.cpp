@@ -6,6 +6,7 @@
 #include "Kismet/GamePlayStatics.h"
 #include "Camera/CameraComponent.h"
 #include "GameMode/EndlessRunnerGameMode.h"
+#include "GameFramework/CharacterMovementcomponent.h"
 #include "Components/CapsuleComponent.h"
 
 // Sets default values
@@ -58,9 +59,7 @@ void APlayerBase::Death()
 void APlayerBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
 	MainGameMode = Cast<AEndlessRunnerGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-    OnActorHit.AddDynamic(this, &APlayerBase::Test);
 }
 
 void APlayerBase::MoveRight()
@@ -86,9 +85,10 @@ void APlayerBase::MoveForward()
 	}
 }
 
-void APlayerBase::Test(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit)
+void APlayerBase::MoveDown()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Choco"));
+	static FVector Impulse = FVector(0, 0, MoveDownImpulse);
+	GetCharacterMovement()->AddImpulse(Impulse, true);
 }
 
 void APlayerBase::Tick(float DeltaTime)

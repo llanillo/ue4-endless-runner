@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GameMode/EndlessRunnerGameMode.h"
 #include "CoinItem.generated.h"
 
 class USceneComponent;
@@ -17,6 +18,9 @@ class ENDLESS_RUNNER_API ACoinItem : public AActor
 {
 	GENERATED_BODY()
 
+	UPROPERTY(VisibleInstanceOnly)
+	AEndlessRunnerGameMode* MainGameMode;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USceneComponent* SceneComponent;
 
@@ -29,8 +33,11 @@ class ENDLESS_RUNNER_API ACoinItem : public AActor
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	URotatingMovementComponent* RotatingMovementComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USoundBase* OverlapSound;
+	
+	UFUNCTION(BlueprintInternalUseOnly)
+	void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool  bFromSweep, const FHitResult &SweepResult);
 	
 public:	
 	// Sets default values for this actor's properties
@@ -39,9 +46,5 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	// virtual void Tick(float DeltaTime) override;
-
+	
 };

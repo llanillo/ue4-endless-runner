@@ -29,6 +29,9 @@ class ENDLESS_RUNNER_API APlayerBase : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Assets", meta = (AllowPrivateAccess = "true"))
 	USoundBase* DeathSound;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess))
+	float MoveDownImpulse = -500.0f;
+	
 	UPROPERTY(VisibleInstanceOnly)
 	AEndlessRunnerGameMode* MainGameMode;
 
@@ -55,8 +58,6 @@ class ENDLESS_RUNNER_API APlayerBase : public ACharacter
 	
 	void MoveForward();
 	void OnDeath();
-	
-	void Test(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit );
 
 public:
 	// Sets default values for this character's properties
@@ -70,7 +71,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void MoveLeft();
- 
+
+	UFUNCTION(BlueprintCallable)
+	void MoveDown();
+	
 protected:
 	
 	// Called when the game starts or when spawned

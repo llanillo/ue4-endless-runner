@@ -6,29 +6,25 @@
 #include "GameFramework/PlayerController.h"
 #include "MainPlayerController.generated.h"
 
-class APlayerBase;
-
 UCLASS()
 class ENDLESS_RUNNER_API AMainPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
-	APlayerBase* CurrentPawn;
+	class APlayerBase* CurrentPawn;
+	
 public:
 	AMainPlayerController();
 
 protected:
+	
 	virtual void BeginPlay() override;
-
+	
 	void Start();
-
 	void MoveRight();
-
 	void MoveLeft();
-
 	void Jump();
-
-	void StopJump();
+	void MoveDown();
 
 public:
 	virtual void SetupInputComponent() override;
