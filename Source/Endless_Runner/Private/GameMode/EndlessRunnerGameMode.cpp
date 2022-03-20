@@ -2,10 +2,20 @@
 
 
 #include "GameMode/EndlessRunnerGameMode.h"
+
+#include "Blueprint/UserWidget.h"
+#include "Kismet/GamePlayStatics.h"
 #include "Tiles/BasicFloorTile.h"
+#include "UI/GameHud.h"
 
 void AEndlessRunnerGameMode::BeginPlay()
 {
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = true;
+	GameHud = Cast<UGameHud>(CreateWidget(GetWorld(), GameHudClass));
+	check(GameHud);
+
+	GameHud->InitializeHud(this);
+	GameHud->AddToViewport();
 	CreateInitialFloorTiles();
 }
 
@@ -51,4 +61,10 @@ ABasicFloorTile* AEndlessRunnerGameMode::AddFloorTile(const bool SpawnItems)
 	}
 
 	return nullptr;
+}
+
+void AEndlessRunnerGameMode::AddCoin()
+{
+	TotalCoins++;
+	OnCoinCountChanged.Broadcast(TotalCoins);
 }

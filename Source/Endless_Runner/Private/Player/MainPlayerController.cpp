@@ -33,9 +33,9 @@ void AMainPlayerController::Jump()
 	CurrentPawn->Jump();
 }
 
-auto AMainPlayerController::StopJump() -> void
+auto AMainPlayerController::MoveDown() -> void
 {
-	CurrentPawn->StopJumping();
+	CurrentPawn->MoveDown();
 }
 
 void AMainPlayerController::SetupInputComponent()
@@ -43,10 +43,9 @@ void AMainPlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 
 	InputComponent->BindAction("Start", IE_Pressed, this, &AMainPlayerController::Start);
-
 	InputComponent->BindAction("MoveRight", IE_Pressed, this, &AMainPlayerController::MoveRight);
 	InputComponent->BindAction("MoveLeft", IE_Pressed, this, &AMainPlayerController::MoveLeft);
-
+	InputComponent->BindAction("MoveDown", IE_Pressed, this, &AMainPlayerController::MoveDown);
 	InputComponent->BindAction("Jump", IE_Pressed, this, &AMainPlayerController::Jump);
-	InputComponent->BindAction("Jump", IE_Released, this, &AMainPlayerController::StopJump);
+	// InputComponent->BindAction("Jump", IE_Released, this, &AMainPlayerController::MoveDown);
 }
