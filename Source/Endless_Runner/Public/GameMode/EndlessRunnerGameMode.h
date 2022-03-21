@@ -10,6 +10,8 @@ class UUserWidget;
 class ABasicFloorTile;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCoinCountChanged, int32, CoinCount);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLivesCountChanged, int32, LivesCount);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLevelReset);
 
 UCLASS()
 class ENDLESS_RUNNER_API AEndlessRunnerGameMode : public AGameModeBase
@@ -29,6 +31,9 @@ class ENDLESS_RUNNER_API AEndlessRunnerGameMode : public AGameModeBase
 	TArray<float> LaneSwitchValues;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Runtime")
+	TArray<ABasicFloorTile*> FloorTiles;
+	
+	UPROPERTY(VisibleInstanceOnly, Category = "Runtime")
 	FTransform NextSpawnPoint;
 
 	UPROPERTY(EditAnywhere, Category = "Config")
@@ -36,10 +41,16 @@ class ENDLESS_RUNNER_API AEndlessRunnerGameMode : public AGameModeBase
 
 	UPROPERTY(VisibleAnywhere, Category = "Collectables")
 	int32 TotalCoins = 0;
+
+	UPROPERTY(VisibleAnywhere, Category = "Player")
+	int32 CurrentLives = 0;
+
+	UPROPERTY(EditAnywhere, Category = "Player")
+	int32 MaxLives = 3;
 	
 	UFUNCTION(BlueprintCallable, Category = "Tiles")
 	void CreateInitialFloorTiles();
-	
+
 public:
 	
 	UFUNCTION(BlueprintCallable)
@@ -47,9 +58,21 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Collectables")
 	void AddCoin();
+
+	UFUNCTION(BlueprintCallable, Category = "Player")
+	void PlayerDied();
+
+	UFUNCTION(BlueprintCallable, Category = "Tiles")
+	void RemoveTile(ABasicFloorTile* Tile);
 	
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Delegates")
 	FOnCoinCountChanged OnCoinCountChanged;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Delegates")
+	FOnLivesCountChanged OnLivesCountChanged;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Delegates")
+	FOnLevelReset OnLevelReset;
 
 protected:
 	// Called when the game starts or when spawned
@@ -57,5 +80,8 @@ protected:
 	
 public:
 
-	const TArray<float>& GetLaneValues() const { return LaneSwitchValues; }
+	FORCEINLINE const TArray<float>& GetLaneValues() const { return LaneSwitchValues; }
+	
+	FORCEINLINE int32 GetMaxLives() const { return MaxLives; }
+
 };

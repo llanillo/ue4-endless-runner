@@ -8,20 +8,17 @@
 
 class UButton;
 
-/**
- * 
- */
 UCLASS()
 class ENDLESS_RUNNER_API UPauseMenu : public UUserWidget
 {
 	GENERATED_BODY()
-
+	
 public:
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	UButton* ContinueBtn;
-
-	UPROPERTY(BlueprintReadWrite, meta = (BindWeight))
+	
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	UButton* RestartBtn;
 
 	UFUNCTION()

@@ -16,7 +16,10 @@ void AEndlessRunnerGameMode::BeginPlay()
 
 	GameHud->InitializeHud(this);
 	GameHud->AddToViewport();
+
 	CreateInitialFloorTiles();
+
+	CurrentLives = MaxLives;
 }
 
 void AEndlessRunnerGameMode::CreateInitialFloorTiles()
@@ -39,6 +42,11 @@ void AEndlessRunnerGameMode::CreateInitialFloorTiles()
 	}
 }
 
+void AEndlessRunnerGameMode::RemoveTile(ABasicFloorTile* Tile)
+{
+	FloorTiles.Remove(Tile);
+}
+
 ABasicFloorTile* AEndlessRunnerGameMode::AddFloorTile(const bool SpawnItems)
 {
 	UWorld* World = GetWorld();
@@ -49,6 +57,8 @@ ABasicFloorTile* AEndlessRunnerGameMode::AddFloorTile(const bool SpawnItems)
 
 		if (Tile)
 		{
+			FloorTiles.Add(Tile);
+			
 			if(SpawnItems)
 			{
 				Tile->SpawnItems();
@@ -67,4 +77,27 @@ void AEndlessRunnerGameMode::AddCoin()
 {
 	TotalCoins++;
 	OnCoinCountChanged.Broadcast(TotalCoins);
+}
+
+void AEndlessRunnerGameMode::PlayerDied()
+{
+	CurrentLives--;
+	OnLivesCountChanged.Broadcast(CurrentLives);
+
+	if(CurrentLives > 0)
+	{
+		for(ABasicFloorTile* FloorTile : FloorTiles)
+		{
+			FloorTile->DestroyFloorTile();
+		}
+
+		FloorTiles.Empty();
+		NextSpawnPoint = FTransform();
+		CreateInitialFloorTiles();
+		OnLevelReset.Broadcast();
+	}
+	else
+	{
+		// GameOver();
+	}
 }

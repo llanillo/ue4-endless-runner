@@ -3,6 +3,7 @@
 
 #include "Player/PlayerBase.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/PlayerStart.h"
 #include "Kismet/GamePlayStatics.h"
 #include "Camera/CameraComponent.h"
 #include "GameMode/EndlessRunnerGameMode.h"
@@ -38,14 +39,27 @@ void APlayerBase::ChangeLaneFinished()
 	CurrentLane = NextLane;
 }
 
+void APlayerBase::ResetLevel()
+{
+	bIsDead = false;
+	EnableInput(nullptr);
+	GetMesh()->SetVisibility(true);
+	
+	if(PlayerStart)
+	{
+		SetActorLocation(PlayerStart->GetActorLocation());
+		SetActorRotation(PlayerStart->GetActorRotation());
+	}
+}
+
 void APlayerBase::Death()
 {
-	if(!IsDead)
+	if(!bIsDead)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Muerto"));
 		const UWorld* World = GetWorld();
-		IsDead = true;
+		bIsDead = true;
 		DisableInput(nullptr);
+		
 		if(World && DeathParticleSystem && DeathSound)
 		{
 			UGameplayStatics::SpawnEmitterAtLocation(World, DeathParticleSystem, GetActorLocation());
@@ -60,6 +74,8 @@ void APlayerBase::BeginPlay()
 {
 	Super::BeginPlay();
 	MainGameMode = Cast<AEndlessRunnerGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	MainGameMode->OnLevelReset.AddDynamic(this, &APlayerBase::ResetLevel);
+	PlayerStart = Cast<APlayerStart>(UGameplayStatics::GetActorOfClass(GetWorld(), APlayerStart::StaticClass()));
 }
 
 void APlayerBase::MoveRight()
@@ -103,6 +119,8 @@ void APlayerBase::OnDeath()
 		GetWorldTimerManager().ClearTimer(RestartTimeHandle);
 	}
 
-	IsDead = false;
-	UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), TEXT("RestartLevel"));
+	bIsDead = false;
+	// UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), TEXT("RestartLevel"));
+	MainGameMode->PlayerDied();
 }
+

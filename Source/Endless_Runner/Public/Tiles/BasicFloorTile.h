@@ -51,6 +51,9 @@ class ENDLESS_RUNNER_API ABasicFloorTile : public AActor
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UBoxComponent* FloorTriggerBox;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TArray<AActor*> ChildActors;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Timer", meta = (AllowPrivateAccess = "true"))
 	FTimerHandle DestroyHandle;
 
@@ -64,10 +67,7 @@ class ENDLESS_RUNNER_API ABasicFloorTile : public AActor
 	float SpawnPercent3 = 0.5f;
 	
 	UFUNCTION(BlueprintCallable)
-	void SpawnLaneItem(const UArrowComponent* Lane, int32& NumBigs) const;
-
-	UFUNCTION(BlueprintCallable)
-	void DestroyFloorTile();
+	void SpawnLaneItem(const UArrowComponent* Lane, int32& NumBigs);
 	
 	UFUNCTION(BlueprintInternalUseOnly)
 	void OnTriggerBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -79,6 +79,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SpawnItems();
+
+	UFUNCTION(BlueprintCallable)
+	void DestroyFloorTile();
 
 protected:
 	

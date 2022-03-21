@@ -45,7 +45,7 @@ class ENDLESS_RUNNER_API APlayerBase : public ACharacter
 	int32 NextLane = 0;
 	
 	UPROPERTY(VisibleInstanceOnly)
-	bool IsDead = false;
+	bool bIsDead = false;
 
 	UPROPERTY(VisibleInstanceOnly)
 	bool IsRunning = false;
@@ -55,9 +55,18 @@ class ENDLESS_RUNNER_API APlayerBase : public ACharacter
 
 	UFUNCTION(BlueprintCallable, Category = "Lane")
 	void ChangeLaneFinished();
-	
+
+	UFUNCTION(BlueprintCallable)
+	void ResetLevel();
+
+	UFUNCTION(BlueprintCallable)
 	void MoveForward();
+
+	UFUNCTION(BlueprintCallable)
 	void OnDeath();
+
+	UPROPERTY()
+	class APlayerStart* PlayerStart;
 
 public:
 	// Sets default values for this character's properties

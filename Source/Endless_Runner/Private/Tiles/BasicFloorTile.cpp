@@ -2,7 +2,6 @@
 
 
 #include "Tiles/BasicFloorTile.h"
-
 #include "Collectables/CoinItem.h"
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
@@ -62,7 +61,7 @@ void ABasicFloorTile::SpawnItems()
 	}
 }
 
-void ABasicFloorTile::SpawnLaneItem(const UArrowComponent* Lane, int32& NumBigs) const
+void ABasicFloorTile::SpawnLaneItem(const UArrowComponent* Lane, int32& NumBigs)
 {
 	const float RandValue = FMath::FRandRange(0.0f, 1.0f);
 	const FAttachmentTransformRules AttachmentTransformRules (EAttachmentRule::KeepRelative, false);
@@ -72,7 +71,7 @@ void ABasicFloorTile::SpawnLaneItem(const UArrowComponent* Lane, int32& NumBigs)
 	if(UKismetMathLibrary::InRange_FloatFloat(RandValue, SpawnPercent1, SpawnPercent2, true, true))
 	{
 		AWallObstacle* SmallWallObstacle = GetWorld()->SpawnActor<AWallObstacle>(SmallObstacleClass, Lane->GetComponentTransform(), SpawnParams);
-		SmallWallObstacle->AttachToComponent(RootComponent, AttachmentTransformRules); // Check if works
+		ChildActors.Add(SmallWallObstacle);
 	}
 	else if(UKismetMathLibrary::InRange_FloatFloat(RandValue, SpawnPercent2, SpawnPercent3, true, true))
 	{
@@ -82,17 +81,21 @@ void ABasicFloorTile::SpawnLaneItem(const UArrowComponent* Lane, int32& NumBigs)
 
 			if(BigWallObstacle)
 			{
-				NumBigs++;	
+				NumBigs++;
 			}
-			else
-			{
-				AWallObstacle* SmallWallObstacle = GetWorld()->SpawnActor<AWallObstacle>(SmallObstacleClass, Lane->GetComponentTransform(), SpawnParams);
-			}
+			
+			ChildActors.Add(BigWallObstacle);
+		}
+		else
+		{
+			AWallObstacle* SmallWallObstacle = GetWorld()->SpawnActor<AWallObstacle>(SmallObstacleClass, Lane->GetComponentTransform(), SpawnParams);
+			ChildActors.Add(SmallWallObstacle);
 		}
 	}
 	else if(UKismetMathLibrary::InRange_FloatFloat(RandValue, SpawnPercent3, 1.0f, true, true))
 	{
 		ACoinItem* CoinItem = GetWorld()->SpawnActor<ACoinItem>(CoinItemClass, Lane->GetComponentTransform(), SpawnParams);
+		ChildActors.Add(CoinItem);
 	}
 }
 
@@ -114,5 +117,15 @@ void ABasicFloorTile::DestroyFloorTile()
 		GetWorldTimerManager().ClearTimer(DestroyHandle);
 	}
 
+	for(AActor* Actor : ChildActors)
+	{
+		if(IsValid(Actor))
+		{
+			Actor->Destroy();
+		}
+	}
+
+	ChildActors.Empty();
+	MainGameMode->RemoveTile(this);
 	Destroy();
 }
