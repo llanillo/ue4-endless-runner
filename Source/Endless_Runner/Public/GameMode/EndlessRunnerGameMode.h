@@ -25,6 +25,9 @@ class ENDLESS_RUNNER_API AEndlessRunnerGameMode : public AGameModeBase
 	TSubclassOf<UUserWidget> GameHudClass;
 
 	UPROPERTY(EditAnywhere, Category = "Config")
+	TSubclassOf<UUserWidget> GameOverClass;
+	
+	UPROPERTY(EditAnywhere, Category = "Config")
 	TSubclassOf<ABasicFloorTile> FloorTileClass;
 	
 	UPROPERTY(VisibleInstanceOnly, Category = "Runtime")
@@ -59,6 +62,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Collectables")
 	void AddCoin();
 
+	UFUNCTION(BlueprintCallable, Category = "Config")
+	void GameOver();
+	
 	UFUNCTION(BlueprintCallable, Category = "Player")
 	void PlayerDied();
 

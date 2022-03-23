@@ -79,6 +79,19 @@ void AEndlessRunnerGameMode::AddCoin()
 	OnCoinCountChanged.Broadcast(TotalCoins);
 }
 
+void AEndlessRunnerGameMode::GameOver()
+{
+	if(IsValid(GameOverClass))
+	{
+		UUserWidget* GameOverWidget = CreateWidget(GetWorld(), GameOverClass);
+
+		if(GameOverWidget)
+		{
+			GameOverWidget->AddToViewport();
+		}
+	}
+}
+
 void AEndlessRunnerGameMode::PlayerDied()
 {
 	CurrentLives--;
@@ -98,6 +111,6 @@ void AEndlessRunnerGameMode::PlayerDied()
 	}
 	else
 	{
-		// GameOver();
+		GameOver();
 	}
 }

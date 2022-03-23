@@ -119,8 +119,6 @@ void APlayerBase::OnDeath()
 		GetWorldTimerManager().ClearTimer(RestartTimeHandle);
 	}
 
-	bIsDead = false;
-	// UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), TEXT("RestartLevel"));
 	MainGameMode->PlayerDied();
 }
 
