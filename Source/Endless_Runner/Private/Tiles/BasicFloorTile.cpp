@@ -16,9 +16,15 @@ ABasicFloorTile::ABasicFloorTile()
 {
 	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
 	RootComponent = SceneComponent;
-
+	
 	FloorMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FloorMesh"));
 	FloorMesh->SetupAttachment(SceneComponent);
+
+	LeftBlockMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("LeftBlockMesh"));
+	LeftBlockMesh->SetupAttachment(SceneComponent);
+
+	RightBlockMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RightBlockMesh"));
+	RightBlockMesh->SetupAttachment(SceneComponent);
 	
 	AttachPoint = CreateDefaultSubobject<UArrowComponent>(TEXT("Attach Point"));
 	AttachPoint->SetupAttachment(SceneComponent);
