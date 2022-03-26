@@ -64,7 +64,7 @@ class ENDLESS_RUNNER_API ABasicFloorTile : public AActor
 	float SpawnPercent3 = 0.5f;
 	
 	UFUNCTION(BlueprintCallable)
-	void SpawnLaneItem(const UArrowComponent* Lane, int32& NumBigs);
+	void SpawnLaneItem(const UArrowComponent* Lane, int32& NumBigWalls);
 	
 	UFUNCTION(BlueprintInternalUseOnly)
 	void OnTriggerBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -102,8 +102,9 @@ public:
 
 	FORCEINLINE const UArrowComponent* GetCenterLane() const { return CenterLane; }
 
-	FORCEINLINE const UArrowComponent* GetRightLane() const {return RightLane;}
+	FORCEINLINE const UArrowComponent* GetRightLane() const { return RightLane; }
 
-	FORCEINLINE const UArrowComponent* GetLeftLane() const {return LeftLane;}
-	
+	FORCEINLINE const UArrowComponent* GetLeftLane() const { return LeftLane; }
+
+	FORCEINLINE FVector GetFloorBounds() const;
 };

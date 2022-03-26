@@ -24,7 +24,7 @@ void AEndlessRunnerGameMode::BeginPlay()
 
 void AEndlessRunnerGameMode::CreateInitialFloorTiles()
 {
-	ABasicFloorTile* Tile = AddFloorTile(false);
+	const ABasicFloorTile* Tile = AddFloorTile(false);
 
 	if (Tile)
 	{
@@ -65,6 +65,8 @@ ABasicFloorTile* AEndlessRunnerGameMode::AddFloorTile(const bool SpawnItems)
 			}
 			
 			NextSpawnPoint = Tile->GetAttachmentTransform();
+			const FVector NextSpawnLoc = NextSpawnPoint.GetLocation();
+			NextSpawnPoint.SetLocation({NextSpawnLoc.X + Tile->GetFloorBounds().X, NextSpawnLoc.Y, NextSpawnLoc.Z});
 		}
 
 		return Tile;

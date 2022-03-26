@@ -56,21 +56,25 @@ void ABasicFloorTile::BeginPlay()
 	FloorTriggerBox->OnComponentBeginOverlap.AddDynamic(this, &ABasicFloorTile::OnTriggerBoxOverlap);
 }
 
+FVector ABasicFloorTile::GetFloorBounds() const
+{
+	return FloorMesh->CalcBounds(FloorMesh->GetComponentTransform()).BoxExtent;
+}
+
 void ABasicFloorTile::SpawnItems()
 {
 	if(IsValid(SmallObstacleClass) && IsValid(BigObstacleClass) && IsValid(CoinItemClass))
 	{
-		int32 NumBigs = 0;
-		SpawnLaneItem(CenterLane, NumBigs);
-		SpawnLaneItem(RightLane, NumBigs);
-		SpawnLaneItem(LeftLane, NumBigs);
+		int32 NumBigWalls = 0;
+		SpawnLaneItem(CenterLane, NumBigWalls);
+		SpawnLaneItem(RightLane, NumBigWalls);
+		SpawnLaneItem(LeftLane, NumBigWalls);
 	}
 }
 
-void ABasicFloorTile::SpawnLaneItem(const UArrowComponent* Lane, int32& NumBigs)
+void ABasicFloorTile::SpawnLaneItem(const UArrowComponent* Lane, int32& NumBigWalls)
 {
 	const float RandValue = FMath::FRandRange(0.0f, 1.0f);
-	const FAttachmentTransformRules AttachmentTransformRules (EAttachmentRule::KeepRelative, false);
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	
@@ -81,13 +85,13 @@ void ABasicFloorTile::SpawnLaneItem(const UArrowComponent* Lane, int32& NumBigs)
 	}
 	else if(UKismetMathLibrary::InRange_FloatFloat(RandValue, SpawnPercent2, SpawnPercent3, true, true))
 	{
-		if(NumBigs <= 2)
+		if(NumBigWalls <= 2)
 		{
 			AWallObstacle* BigWallObstacle = GetWorld()->SpawnActor<AWallObstacle>(BigObstacleClass, Lane->GetComponentTransform(), SpawnParams);
 
 			if(BigWallObstacle)
 			{
-				NumBigs++;
+				NumBigWalls++;
 			}
 			
 			ChildActors.Add(BigWallObstacle);
