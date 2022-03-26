@@ -7,7 +7,7 @@
 #include "EndlessRunnerGameMode.generated.h"
 
 class UUserWidget;
-class ABasicFloorTile;
+class AFloorTile;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCoinCountChanged, int32, CoinCount);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLivesCountChanged, int32, LivesCount);
@@ -28,13 +28,13 @@ class ENDLESS_RUNNER_API AEndlessRunnerGameMode : public AGameModeBase
 	TSubclassOf<UUserWidget> GameOverClass;
 	
 	UPROPERTY(EditAnywhere, Category = "Config")
-	TSubclassOf<ABasicFloorTile> FloorTileClass;
+	TSubclassOf<AFloorTile> FloorTileClass;
 	
 	UPROPERTY(VisibleInstanceOnly, Category = "Runtime")
 	TArray<float> LaneSwitchValues;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Runtime")
-	TArray<ABasicFloorTile*> FloorTiles;
+	TArray<AFloorTile*> FloorTiles;
 	
 	UPROPERTY(VisibleInstanceOnly, Category = "Runtime")
 	FTransform NextSpawnPoint;
@@ -57,7 +57,7 @@ class ENDLESS_RUNNER_API AEndlessRunnerGameMode : public AGameModeBase
 public:
 	
 	UFUNCTION(BlueprintCallable)
-	ABasicFloorTile* AddFloorTile(const bool SpawnItems);
+	AFloorTile* AddFloorTile(const bool SpawnItems);
 
 	UFUNCTION(BlueprintCallable, Category = "Collectables")
 	void AddCoin();
@@ -69,7 +69,7 @@ public:
 	void PlayerDied();
 
 	UFUNCTION(BlueprintCallable, Category = "Tiles")
-	void RemoveTile(ABasicFloorTile* Tile);
+	void RemoveTile(AFloorTile* Tile);
 	
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Delegates")
 	FOnCoinCountChanged OnCoinCountChanged;

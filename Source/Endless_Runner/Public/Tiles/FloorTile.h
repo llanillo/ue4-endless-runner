@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Components/ArrowComponent.h"
-#include "BasicFloorTile.generated.h"
+#include "FloorTile.generated.h"
 
 class ACoinItem;
 class USceneComponent;
 class UBoxComponent;
 class AWallObstacle;
 class AEndlessRunnerGameMode;
+class UArrowComponent;
 
 UCLASS()
-class ENDLESS_RUNNER_API ABasicFloorTile : public AActor
+class ENDLESS_RUNNER_API AFloorTile : public AActor
 {
 	GENERATED_BODY()
 	
@@ -83,7 +83,7 @@ protected:
 public:
 	
 	// Sets default values for this actor's properties
-	ABasicFloorTile();
+	AFloorTile();
 
 	UFUNCTION(BlueprintCallable)
 	void SpawnItems();
@@ -98,7 +98,7 @@ protected:
 
 public:
 	
-	FORCEINLINE const FTransform& GetAttachmentTransform() const { return AttachPoint->GetComponentTransform(); }
+	FORCEINLINE const FTransform& GetAttachmentTransform() const;
 
 	FORCEINLINE const UArrowComponent* GetCenterLane() const { return CenterLane; }
 

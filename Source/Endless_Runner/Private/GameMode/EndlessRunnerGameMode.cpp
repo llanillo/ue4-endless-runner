@@ -5,7 +5,8 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GamePlayStatics.h"
-#include "Tiles/BasicFloorTile.h"
+#include "Components/ArrowComponent.h"
+#include "Tiles/FloorTile.h"
 #include "UI/GameHud.h"
 
 void AEndlessRunnerGameMode::BeginPlay()
@@ -24,7 +25,7 @@ void AEndlessRunnerGameMode::BeginPlay()
 
 void AEndlessRunnerGameMode::CreateInitialFloorTiles()
 {
-	const ABasicFloorTile* Tile = AddFloorTile(false);
+	const AFloorTile* Tile = AddFloorTile(false);
 
 	if (Tile)
 	{
@@ -42,18 +43,18 @@ void AEndlessRunnerGameMode::CreateInitialFloorTiles()
 	}
 }
 
-void AEndlessRunnerGameMode::RemoveTile(ABasicFloorTile* Tile)
+void AEndlessRunnerGameMode::RemoveTile(AFloorTile* Tile)
 {
 	FloorTiles.Remove(Tile);
 }
 
-ABasicFloorTile* AEndlessRunnerGameMode::AddFloorTile(const bool SpawnItems)
+AFloorTile* AEndlessRunnerGameMode::AddFloorTile(const bool SpawnItems)
 {
 	UWorld* World = GetWorld();
 	
 	if (World)
 	{
-		ABasicFloorTile* Tile = World->SpawnActor<ABasicFloorTile>(FloorTileClass, NextSpawnPoint);
+		AFloorTile* Tile = World->SpawnActor<AFloorTile>(FloorTileClass, NextSpawnPoint);
 
 		if (Tile)
 		{
@@ -101,7 +102,7 @@ void AEndlessRunnerGameMode::PlayerDied()
 
 	if(CurrentLives > 0)
 	{
-		for(ABasicFloorTile* FloorTile : FloorTiles)
+		for(AFloorTile* FloorTile : FloorTiles)
 		{
 			FloorTile->DestroyFloorTile();
 		}

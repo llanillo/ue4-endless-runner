@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Tiles/BasicFloorTile.h"
+#include "Tiles/FloorTile.h"
 #include "Collectables/CoinItem.h"
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
@@ -12,7 +12,7 @@
 #include "Obstacles/WallObstacle.h"
 
 // Sets default values
-ABasicFloorTile::ABasicFloorTile()
+AFloorTile::AFloorTile()
 {
 	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
 	RootComponent = SceneComponent;
@@ -45,7 +45,7 @@ ABasicFloorTile::ABasicFloorTile()
 }
 
 // Called when the game starts or when spawned
-void ABasicFloorTile::BeginPlay()
+void AFloorTile::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -53,15 +53,20 @@ void ABasicFloorTile::BeginPlay()
 	
 	check(MainGameMode);
 
-	FloorTriggerBox->OnComponentBeginOverlap.AddDynamic(this, &ABasicFloorTile::OnTriggerBoxOverlap);
+	FloorTriggerBox->OnComponentBeginOverlap.AddDynamic(this, &AFloorTile::OnTriggerBoxOverlap);
 }
 
-FVector ABasicFloorTile::GetFloorBounds() const
+const FTransform& AFloorTile::GetAttachmentTransform() const
+{
+	return AttachPoint->GetComponentTransform();
+}
+
+FVector AFloorTile::GetFloorBounds() const
 {
 	return FloorMesh->CalcBounds(FloorMesh->GetComponentTransform()).BoxExtent;
 }
 
-void ABasicFloorTile::SpawnItems()
+void AFloorTile::SpawnItems()
 {
 	if(IsValid(SmallObstacleClass) && IsValid(BigObstacleClass) && IsValid(CoinItemClass))
 	{
@@ -72,7 +77,7 @@ void ABasicFloorTile::SpawnItems()
 	}
 }
 
-void ABasicFloorTile::SpawnLaneItem(const UArrowComponent* Lane, int32& NumBigWalls)
+void AFloorTile::SpawnLaneItem(const UArrowComponent* Lane, int32& NumBigWalls)
 {
 	const float RandValue = FMath::FRandRange(0.0f, 1.0f);
 	FActorSpawnParameters SpawnParams;
@@ -109,18 +114,18 @@ void ABasicFloorTile::SpawnLaneItem(const UArrowComponent* Lane, int32& NumBigWa
 	}
 }
 
-void ABasicFloorTile::OnTriggerBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AFloorTile::OnTriggerBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	const APlayerBase* MainCharacter = Cast<APlayerBase>(OtherActor);
 
 	if (MainCharacter)
 	{
 		MainGameMode->AddFloorTile(true);
-		GetWorldTimerManager().SetTimer(DestroyHandle, this, &ABasicFloorTile::DestroyFloorTile, 2.0f, false);
+		GetWorldTimerManager().SetTimer(DestroyHandle, this, &AFloorTile::DestroyFloorTile, 2.0f, false);
 	}
 }
 
-void ABasicFloorTile::DestroyFloorTile()
+void AFloorTile::DestroyFloorTile()
 {
 	if (DestroyHandle.IsValid())
 	{

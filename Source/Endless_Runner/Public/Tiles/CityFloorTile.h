@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Tiles/BasicFloorTile.h"
+#include "Tiles/FloorTile.h"
 #include "CityFloorTile.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ENDLESS_RUNNER_API ACityFloorTile : public ABasicFloorTile
+class ENDLESS_RUNNER_API ACityFloorTile : public AFloorTile
 {
 	GENERATED_BODY()
 	
