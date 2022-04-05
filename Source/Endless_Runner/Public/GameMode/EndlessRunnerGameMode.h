@@ -8,6 +8,7 @@
 
 class UUserWidget;
 class AFloorTile;
+class AObstacleTile;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCoinCountChanged, int32, CoinCount);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLivesCountChanged, int32, LivesCount);
@@ -57,7 +58,7 @@ class ENDLESS_RUNNER_API AEndlessRunnerGameMode : public AGameModeBase
 public:
 	
 	UFUNCTION(BlueprintCallable)
-	AFloorTile* AddFloorTile(const bool SpawnItems);
+	AObstacleTile* AddFloorTile(const bool SpawnItems);
 
 	UFUNCTION(BlueprintCallable, Category = "Collectables")
 	void AddCoin();
@@ -81,13 +82,13 @@ public:
 	FOnLevelReset OnLevelReset;
 
 protected:
+	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	
 public:
 
 	FORCEINLINE const TArray<float>& GetLaneValues() const { return LaneSwitchValues; }
-	
-	FORCEINLINE int32 GetMaxLives() const { return MaxLives; }
+	FORCEINLINE const int32& GetMaxLives() const { return MaxLives; }
 
 };

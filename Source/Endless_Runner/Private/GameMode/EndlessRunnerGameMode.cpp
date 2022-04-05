@@ -2,11 +2,11 @@
 
 
 #include "GameMode/EndlessRunnerGameMode.h"
-
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GamePlayStatics.h"
 #include "Components/ArrowComponent.h"
 #include "Tiles/FloorTile.h"
+#include "Tiles/ObstacleTile.h"
 #include "UI/GameHud.h"
 
 void AEndlessRunnerGameMode::BeginPlay()
@@ -25,7 +25,7 @@ void AEndlessRunnerGameMode::BeginPlay()
 
 void AEndlessRunnerGameMode::CreateInitialFloorTiles()
 {
-	const AFloorTile* Tile = AddFloorTile(false);
+	const AObstacleTile* Tile = AddFloorTile(false);
 
 	if (Tile)
 	{
@@ -48,13 +48,13 @@ void AEndlessRunnerGameMode::RemoveTile(AFloorTile* Tile)
 	FloorTiles.Remove(Tile);
 }
 
-AFloorTile* AEndlessRunnerGameMode::AddFloorTile(const bool SpawnItems)
+AObstacleTile* AEndlessRunnerGameMode::AddFloorTile(const bool SpawnItems)
 {
 	UWorld* World = GetWorld();
 	
 	if (World)
 	{
-		AFloorTile* Tile = World->SpawnActor<AFloorTile>(FloorTileClass, NextSpawnPoint);
+		AObstacleTile* Tile = World->SpawnActor<AObstacleTile>(FloorTileClass, NextSpawnPoint);
 
 		if (Tile)
 		{
