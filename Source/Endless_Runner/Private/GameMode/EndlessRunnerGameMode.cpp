@@ -7,34 +7,45 @@
 #include "Components/ArrowComponent.h"
 #include "Tiles/FloorTile.h"
 #include "Tiles/ObstacleTile.h"
+#include "Environment/Pool/ObjectPool.h"
+#include "Environment/Pool/PooledObject.h"
 #include "UI/GameHud.h"
 
 void AEndlessRunnerGameMode::BeginPlay()
 {
+	// SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Scene Component"));
+	// RootComponent = SceneComponent;
+	
 	UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = true;
 	GameHud = Cast<UGameHud>(CreateWidget(GetWorld(), GameHudClass));
 	check(GameHud);
-
+	
 	GameHud->InitializeHud(this);
 	GameHud->AddToViewport();
 
-	CreateInitialFloorTiles();
-
 	CurrentLives = MaxLives;
+	
+	TilesPool->InitializePool();
+	CreateInitialFloorTiles();
+}
+
+AEndlessRunnerGameMode::AEndlessRunnerGameMode()
+{
+	TilesPool = CreateDefaultSubobject<UObjectPool>(TEXT("Floor Tiles Pool"));
+	AddOwnedComponent(TilesPool);
 }
 
 void AEndlessRunnerGameMode::CreateInitialFloorTiles()
 {
 	const AObstacleTile* Tile = AddFloorTile(false);
-
+	
 	if (Tile)
 	{
 		LaneSwitchValues.Add(Tile->GetLeftLane()->GetComponentLocation().Y);
 		LaneSwitchValues.Add(Tile->GetCenterLane()->GetComponentLocation().Y);
 		LaneSwitchValues.Add(Tile->GetRightLane()->GetComponentLocation().Y);
 	}
-
-	AddFloorTile(false);
+	
 	AddFloorTile(false);
 	
 	for (int i = 0; i < NumInitialFloorTiles; i++) 
@@ -43,22 +54,17 @@ void AEndlessRunnerGameMode::CreateInitialFloorTiles()
 	}
 }
 
-void AEndlessRunnerGameMode::RemoveTile(AFloorTile* Tile)
-{
-	FloorTiles.Remove(Tile);
-}
-
 AObstacleTile* AEndlessRunnerGameMode::AddFloorTile(const bool SpawnItems)
 {
-	UWorld* World = GetWorld();
-	
-	if (World)
+	if (GetWorld())
 	{
-		AObstacleTile* Tile = World->SpawnActor<AObstacleTile>(FloorTileClass, NextSpawnPoint);
-
+		// AObstacleTile* Tile = World->SpawnActor<AObstacleTile>(FloorTileClass, NextSpawnPoint);
+		AObstacleTile* Tile = Cast<AObstacleTile>(TilesPool->SpawnPooledObject(NextSpawnPoint));
+		
 		if (Tile)
 		{
-			FloorTiles.Add(Tile);
+			// FloorTiles.Add(Tile);
+			Tile->SetActive(true);
 			
 			if(SpawnItems)
 			{
@@ -102,12 +108,20 @@ void AEndlessRunnerGameMode::PlayerDied()
 
 	if(CurrentLives > 0)
 	{
-		for(AFloorTile* FloorTile : FloorTiles)
+		for(int i = 0; i < TilesPool->GetPoolSize(); i++)
 		{
-			FloorTile->DestroyFloorTile();
-		}
+			APooledObject* PooledObject;
+			TilesPool->GetPoolQueue().Dequeue(PooledObject);
 
-		FloorTiles.Empty();
+			if(IsValid(PooledObject))
+			{
+				AObstacleTile* const FloorTile = Cast<AObstacleTile>(PooledObject);
+				FloorTile->DestroyFloorTile();
+				TilesPool->GetPoolQueue().Enqueue(FloorTile);
+			}
+		}
+		
+		// FloorTiles.Empty();
 		NextSpawnPoint = FTransform();
 		CreateInitialFloorTiles();
 		OnLevelReset.Broadcast();

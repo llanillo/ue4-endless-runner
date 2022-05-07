@@ -79,7 +79,7 @@ void AFloorTile::OnTriggerBoxOverlap(UPrimitiveComponent* OverlappedComponent, A
 	if (MainCharacter)
 	{
 		MainGameMode->AddFloorTile(true);
-		GetWorldTimerManager().SetTimer(DestroyHandle, this, &AFloorTile::DestroyFloorTile, 2.0f, false);
+		GetWorldTimerManager().SetTimer(DestroyTimer, this, &AFloorTile::DestroyFloorTile, 3.0f, false);
 	}
 }
 
@@ -96,9 +96,9 @@ UStaticMesh* AFloorTile::GetRandomSideMesh() const
 
 void AFloorTile::DestroyFloorTile()
 {
-	if (DestroyHandle.IsValid())
+	if (DestroyTimer.IsValid())
 	{
-		GetWorldTimerManager().ClearTimer(DestroyHandle);
+		GetWorldTimerManager().ClearTimer(DestroyTimer);
 	}
 
 	for(AActor* Actor : ChildActors)
@@ -109,7 +109,8 @@ void AFloorTile::DestroyFloorTile()
 		}
 	}
 
+	SetActive(false);
 	ChildActors.Empty();
-	MainGameMode->RemoveTile(this);
-	Destroy();
+	// MainGameMode->RemoveTile(this);
+	// Destroy();
 }

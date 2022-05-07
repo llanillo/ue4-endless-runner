@@ -3,7 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "Environment/Pool/ObjectPool.h"
+#include "Environment/Pool/PooledObject.h"
 #include "FloorTile.generated.h"
 
 class ACoinItem;
@@ -14,7 +15,7 @@ class AEndlessRunnerGameMode;
 class UArrowComponent;
 
 UCLASS()
-class ENDLESS_RUNNER_API AFloorTile : public AActor
+class ENDLESS_RUNNER_API AFloorTile : public APooledObject
 {
 	GENERATED_BODY()
 	
@@ -25,13 +26,16 @@ class ENDLESS_RUNNER_API AFloorTile : public AActor
 	TArray<AActor*> ChildActors;
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Timer", meta = (AllowPrivateAccess = "true"))
-	FTimerHandle DestroyHandle;
+	FTimerHandle DestroyTimer;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Config", meta = (AllowPrivateAccess = "true"))
 	TArray<UStaticMesh*> SideTileMeshes;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ACoinItem> CoinItemClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UObjectPool* FloorTilePool;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* FloorMesh;
@@ -79,7 +83,7 @@ public:
 
 	AFloorTile();
 	
+	UStaticMeshComponent* GetFloorRoadMesh() const { return FloorRoadMesh; };
 	FORCEINLINE const FTransform& GetAttachmentTransform() const;
 	FORCEINLINE FVector GetFloorBounds() const;
-	FORCEINLINE UStaticMeshComponent* GetFloorRoadMesh() const { return FloorRoadMesh; };
 };
