@@ -10,6 +10,8 @@ class UUserWidget;
 class AFloorTile;
 class AObstacleTile;
 class UObjectPool;
+class APooledObject;
+class UGameHud;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCoinCountChanged, int32, CoinCount);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLivesCountChanged, int32, LivesCount);
@@ -23,29 +25,23 @@ class ENDLESS_RUNNER_API AEndlessRunnerGameMode : public AGameModeBase
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USceneComponent* SceneComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UObjectPool* TilesPool;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, NoClear, Category = "Config", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, NoClear, Category = "Config", meta = (AllowPrivateAccess = "true"))
 	int32 NumInitialFloorTiles = 10;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, Category = "Widget")
 	TSubclassOf<UUserWidget> GameHudClass;
 
-	UPROPERTY(EditAnywhere, Category = "Config")
+	UPROPERTY(EditAnywhere, Category = "Widget")
 	TSubclassOf<UUserWidget> GameOverClass;
 	
-	// UPROPERTY(EditAnywhere, Category = "Config")
-	// TSubclassOf<AFloorTile> FloorTileClass;
-
-	UPROPERTY(VisibleInstanceOnly, Category = "Runtime")
-	class UGameHud* GameHud;
+	UPROPERTY(VisibleInstanceOnly, Category = "Widget")
+	UGameHud* GameHud;
 	
 	UPROPERTY(VisibleInstanceOnly, Category = "Runtime")
 	TArray<float> LaneSwitchValues;
-
-	// UPROPERTY(VisibleInstanceOnly, Category = "Runtime")
-	// TArray<AFloorTile*> FloorTiles;
 	
 	UPROPERTY(VisibleInstanceOnly, Category = "Runtime")
 	FTransform NextSpawnPoint {};
@@ -59,25 +55,22 @@ class ENDLESS_RUNNER_API AEndlessRunnerGameMode : public AGameModeBase
 	UPROPERTY(EditAnywhere, Category = "Player")
 	int32 MaxLives = 3;
 	
-	UFUNCTION(BlueprintCallable, Category = "Tiles")
-	void CreateInitialFloorTiles();
+	UFUNCTION(BlueprintCallable, Category = "Runtime")
+	void CreateInitialFloorTiles(int InitialFloorTiles);
 
 public:
 
-	UFUNCTION(BlueprintCallable)
-	AObstacleTile* AddFloorTile(const bool SpawnItems);
-
-	UFUNCTION(BlueprintCallable, Category = "Collectables")
+	UFUNCTION(BlueprintCallable, Category = "Runtime")
+	AObstacleTile* AddFloorTile(bool SpawnItems);
+	
+	UFUNCTION(BlueprintCallable, Category = "Player")
 	void AddCoin();
 
-	UFUNCTION(BlueprintCallable, Category = "Config")
+	UFUNCTION(BlueprintCallable, Category = "Runtime")
 	void GameOver();
 	
 	UFUNCTION(BlueprintCallable, Category = "Player")
 	void PlayerDied();
-
-	// UFUNCTION(BlueprintCallable, Category = "Tiles")
-	// void RemoveTile(AFloorTile* Tile);
 	
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Delegates")
 	FOnCoinCountChanged OnCoinCountChanged;

@@ -20,7 +20,7 @@ void AObstacleTile::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GetFloorRoadMesh()->SetStaticMesh(Util::GetRandomStaticMesh(FloorMeshes));
+	GetFloorRoadMesh()->SetStaticMesh(Util::GetRandomStaticMesh(GetFloorMeshes()));
 	GetFloorRoadMesh()->SetWorldScale3D(FVector{30, 30, 30});
 }
 

@@ -6,33 +6,31 @@
 #include "GameFramework/Actor.h"
 #include "PooledObject.generated.h"
 
-// class APooledObject;
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPooledObjectDespawn, APooledObject*, PoolActor);
-
 UCLASS()
 class ENDLESS_RUNNER_API APooledObject : public AActor
 {
 	GENERATED_BODY()
 
-	UPROPERTY(BlueprintReadOnly, Category = "Timer", meta = (AllowPrivateACcess = "true"))
+	UPROPERTY(BlueprintReadOnly, Category = "Object Pool", meta = (AllowPrivateACcess = "true"))
 	FTimerHandle LifeSpanTimer;
-	
-	UFUNCTION(BlueprintCallable, Category = "Pooled Object")
-	void Desactivate();
-public:	
-
-	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Delegates")
-	FOnPooledObjectDespawn OnPooledObjectDespawn;
-
-private:
-
-	float LifeSpan;
 
 public:
+
+	UFUNCTION(BlueprintCallable, Category = "Object Pool")
+	virtual void OnSpawn();
 	
+private:
+	float LifeSpan;
+
+
+public:
 	// Sets default values for this actor's properties
 	APooledObject();
 	
 	virtual void SetLifeSpan(float InLifespan) override;
-	void SetActive(bool IsActive);
+
+protected:
+
+	FORCEINLINE virtual float GetLifeSpan() const override;
+	FORCEINLINE FTimerHandle& GetLifeSpanTimer() { return LifeSpanTimer; }
 };

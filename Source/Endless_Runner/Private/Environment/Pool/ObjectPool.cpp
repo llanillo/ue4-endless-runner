@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Environment/Pool/PooledObject.h"
 #include "Environment/Pool/ObjectPool.h"
+#include "Environment/Pool/PooledObject.h"
 
 // Sets default values for this component's properties
 UObjectPool::UObjectPool()
@@ -14,7 +14,8 @@ APooledObject* UObjectPool::SpawnPooledObject(const FTransform& Transform)
 	{
 		APooledObject* PooledObject;
 		ObjectPoolQueue.Dequeue(PooledObject);
-		PooledObject->SetActive(true);
+		PooledObject->SetActorHiddenInGame(false);
+		PooledObject->OnSpawn();
 		PooledObject->TeleportTo(Transform.GetLocation(), Transform.GetRotation().Rotator());
 		ObjectPoolQueue.Enqueue(PooledObject);
 		return PooledObject;
@@ -23,23 +24,18 @@ APooledObject* UObjectPool::SpawnPooledObject(const FTransform& Transform)
 	return nullptr;
 }
 
-void UObjectPool::InitializePool()
+void UObjectPool::InitializePool(const FTransform& InitialTransform)
 {
 	if(IsValid(PooledObjectClass))
 	{
-		UWorld* const World = GetWorld();
-		
-		if(World)
+		if(UWorld* const World = GetWorld())
 		{
 			for(int i = 0; i < PoolSize; i++)
 			{
-				APooledObject* const PooledActor = World->SpawnActor<APooledObject>(PooledObjectClass, FVector().ZeroVector, FRotator().ZeroRotator);
-				
-				if(PooledActor)
+				if(APooledObject* const PooledActor = World->SpawnActor<APooledObject>(PooledObjectClass, InitialTransform))
 				{
-					PooledActor->OnPooledObjectDespawn.AddDynamic(this, &UObjectPool::OnPooledObjectDespawn);
 					PooledActor->SetLifeSpan(ObjectLifeSpan);
-					PooledActor->SetActive(false);
+					PooledActor->SetActorHiddenInGame(true);
 					ObjectPoolQueue.Enqueue(PooledActor);
 				}
 			}
@@ -49,10 +45,10 @@ void UObjectPool::InitializePool()
 
 void UObjectPool::OnPooledObjectDespawn(APooledObject* PoolActor)
 {
-	ObjectPoolQueue.Enqueue(PoolActor);
+	PoolActor->SetActorHiddenInGame(true);
 }
 
-int32 UObjectPool::GetPoolSize()
+int32 UObjectPool::GetPoolSize() const
 {
 	return PoolSize;
 }

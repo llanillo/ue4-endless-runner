@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "GameMode/EndlessRunnerGameMode.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GamePlayStatics.h"
@@ -13,59 +10,62 @@
 
 void AEndlessRunnerGameMode::BeginPlay()
 {
-	// SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Scene Component"));
-	// RootComponent = SceneComponent;
-	
+	// Show player cursor at the start of the game
 	UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = true;
+
+	// Create and initialize the GUI
 	GameHud = Cast<UGameHud>(CreateWidget(GetWorld(), GameHudClass));
 	check(GameHud);
-	
 	GameHud->InitializeHud(this);
 	GameHud->AddToViewport();
 
+	// Initial player lives
 	CurrentLives = MaxLives;
-	
-	TilesPool->InitializePool();
-	CreateInitialFloorTiles();
+
+	// Initialize the tiles pool and spawn the initial floor tiles
+	const FVector InitialPosition = FVector{-10000, -10000, -10000};
+	TilesPool->InitializePool(FTransform{InitialPosition});
+	CreateInitialFloorTiles(NumInitialFloorTiles);
 }
 
 AEndlessRunnerGameMode::AEndlessRunnerGameMode()
 {
+	// Creates and attach the pool object component
 	TilesPool = CreateDefaultSubobject<UObjectPool>(TEXT("Floor Tiles Pool"));
 	AddOwnedComponent(TilesPool);
 }
-
-void AEndlessRunnerGameMode::CreateInitialFloorTiles()
+/*
+ *	Spawn Initial Floor Tiles
+ */
+void AEndlessRunnerGameMode::CreateInitialFloorTiles(int InitialFloorTiles)
 {
-	const AObstacleTile* Tile = AddFloorTile(false);
-	
-	if (Tile)
+	// Lane switch values to control the player movement between lanes
+	if (const AObstacleTile* Tile = AddFloorTile(false))
 	{
 		LaneSwitchValues.Add(Tile->GetLeftLane()->GetComponentLocation().Y);
 		LaneSwitchValues.Add(Tile->GetCenterLane()->GetComponentLocation().Y);
 		LaneSwitchValues.Add(Tile->GetRightLane()->GetComponentLocation().Y);
 	}
-	
+
 	AddFloorTile(false);
 	
-	for (int i = 0; i < NumInitialFloorTiles; i++) 
+	for (int i = 0; i < InitialFloorTiles; i++) 
 	{
 		AddFloorTile(true); 
 	}
 }
 
-AObstacleTile* AEndlessRunnerGameMode::AddFloorTile(const bool SpawnItems)
+/*
+ *	Spawn a floor tile in the next spawn point and move it to the next location
+ */
+AObstacleTile* AEndlessRunnerGameMode::AddFloorTile(bool SpawnItems)
 {
 	if (GetWorld())
 	{
-		// AObstacleTile* Tile = World->SpawnActor<AObstacleTile>(FloorTileClass, NextSpawnPoint);
 		AObstacleTile* Tile = Cast<AObstacleTile>(TilesPool->SpawnPooledObject(NextSpawnPoint));
 		
 		if (Tile)
 		{
-			// FloorTiles.Add(Tile);
-			Tile->SetActive(true);
-			
 			if(SpawnItems)
 			{
 				Tile->SpawnItems();
@@ -82,25 +82,32 @@ AObstacleTile* AEndlessRunnerGameMode::AddFloorTile(const bool SpawnItems)
 	return nullptr;
 }
 
+/*
+ *	Add one on the coin counter
+ */
 void AEndlessRunnerGameMode::AddCoin()
 {
 	TotalCoins++;
 	OnCoinCountChanged.Broadcast(TotalCoins);
 }
 
+/*
+ *	Shows game over GUI
+ */
 void AEndlessRunnerGameMode::GameOver()
 {
 	if(IsValid(GameOverClass))
 	{
-		UUserWidget* GameOverWidget = CreateWidget(GetWorld(), GameOverClass);
-
-		if(GameOverWidget)
+		if(UUserWidget* const GameOverWidget = CreateWidget(GetWorld(), GameOverClass))
 		{
 			GameOverWidget->AddToViewport();
 		}
 	}
 }
 
+/*
+ *	Prepare world for the next player live
+ */
 void AEndlessRunnerGameMode::PlayerDied()
 {
 	CurrentLives--;
@@ -108,22 +115,22 @@ void AEndlessRunnerGameMode::PlayerDied()
 
 	if(CurrentLives > 0)
 	{
+		NextSpawnPoint = FTransform();
+		
 		for(int i = 0; i < TilesPool->GetPoolSize(); i++)
 		{
-			APooledObject* PooledObject;
-			TilesPool->GetPoolQueue().Dequeue(PooledObject);
+			APooledObject* PooledObject = Cast<AObstacleTile>(TilesPool->SpawnPooledObject(NextSpawnPoint));
 
 			if(IsValid(PooledObject))
 			{
 				AObstacleTile* const FloorTile = Cast<AObstacleTile>(PooledObject);
-				FloorTile->DestroyFloorTile();
-				TilesPool->GetPoolQueue().Enqueue(FloorTile);
+				FloorTile->PrepareNextTile();
 			}
 		}
 		
 		// FloorTiles.Empty();
 		NextSpawnPoint = FTransform();
-		CreateInitialFloorTiles();
+		CreateInitialFloorTiles(NumInitialFloorTiles);
 		OnLevelReset.Broadcast();
 	}
 	else

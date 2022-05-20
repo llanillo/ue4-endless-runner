@@ -5,9 +5,9 @@
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GamePlayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Player/PlayerBase.h"
 #include "GameMode/EndlessRunnerGameMode.h"
-#include "Kismet/KismetMathLibrary.h"
 
 AFloorTile::AFloorTile()
 {
@@ -72,14 +72,16 @@ const TSubclassOf<ACoinItem>& AFloorTile::GetCoinItemClass() const
 	return CoinItemClass; 
 }
 
+const TArray<UStaticMesh*>& AFloorTile::GetFloorMeshes() const
+{
+	return FloorMeshes;
+}
+
 void AFloorTile::OnTriggerBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	const APlayerBase* MainCharacter = Cast<APlayerBase>(OtherActor);
-
-	if (MainCharacter)
+	if (Cast<APlayerBase>(OtherActor))
 	{
-		MainGameMode->AddFloorTile(true);
-		GetWorldTimerManager().SetTimer(DestroyTimer, this, &AFloorTile::DestroyFloorTile, 3.0f, false);
+		GetWorldTimerManager().SetTimer(GetLifeSpanTimer(), this, &AFloorTile::PrepareNextTile, GetLifeSpan(), false);
 	}
 }
 
@@ -94,13 +96,8 @@ UStaticMesh* AFloorTile::GetRandomSideMesh() const
 	return nullptr;
 }
 
-void AFloorTile::DestroyFloorTile()
+void AFloorTile::DestroyChildActors()
 {
-	if (DestroyTimer.IsValid())
-	{
-		GetWorldTimerManager().ClearTimer(DestroyTimer);
-	}
-
 	for(AActor* Actor : ChildActors)
 	{
 		if(IsValid(Actor))
@@ -109,8 +106,17 @@ void AFloorTile::DestroyFloorTile()
 		}
 	}
 
-	SetActive(false);
 	ChildActors.Empty();
-	// MainGameMode->RemoveTile(this);
-	// Destroy();
+}
+
+void AFloorTile::PrepareNextTile()
+{
+	if(GetLifeSpanTimer().IsValid())
+	{
+		GetWorldTimerManager().ClearTimer(GetLifeSpanTimer());
+	}
+
+	DestroyChildActors();
+	SetActorHiddenInGame(true);
+	MainGameMode->AddFloorTile(true);
 }

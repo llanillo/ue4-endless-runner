@@ -20,9 +20,6 @@ class ENDLESS_RUNNER_API AObstacleTile : public AFloorTile
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* RoadMesh;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Config", meta = (AllowPrivateAccess = "true"))
-	TArray<UStaticMesh*> FloorMeshes;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AObstacle> SmallObstacleClass;

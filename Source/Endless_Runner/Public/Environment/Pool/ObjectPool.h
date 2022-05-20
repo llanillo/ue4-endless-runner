@@ -31,11 +31,11 @@ public:
 	APooledObject* SpawnPooledObject(const FTransform& Transform);
 
 	UFUNCTION(BlueprintCallable, Category = "Object Pool")
-	void InitializePool();
+	void InitializePool(const FTransform& InitialTransform);
 	
 	UFUNCTION()
 	void OnPooledObjectDespawn(APooledObject* PoolActor);
 
 	TQueue<APooledObject*>& GetPoolQueue(); 
-	int32 GetPoolSize();
+	int32 GetPoolSize() const;
 };

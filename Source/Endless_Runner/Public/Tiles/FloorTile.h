@@ -19,10 +19,10 @@ class ENDLESS_RUNNER_API AFloorTile : public APooledObject
 {
 	GENERATED_BODY()
 	
-	UPROPERTY(BlueprintReadOnly, Category = "Game Mode", meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, Category = "Game Mode")
 	AEndlessRunnerGameMode* MainGameMode;
 	
-	UPROPERTY(BlueprintReadOnly, Category = "Child Actors", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, Category = "Child Actors")
 	TArray<AActor*> ChildActors;
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Timer", meta = (AllowPrivateAccess = "true"))
@@ -31,6 +31,9 @@ class ENDLESS_RUNNER_API AFloorTile : public APooledObject
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Config", meta = (AllowPrivateAccess = "true"))
 	TArray<UStaticMesh*> SideTileMeshes;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Config", meta = (AllowPrivateAccess = "true"))
+	TArray<UStaticMesh*> FloorMeshes;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ACoinItem> CoinItemClass;
 
@@ -64,10 +67,17 @@ class ENDLESS_RUNNER_API AFloorTile : public APooledObject
 	UFUNCTION()
 	UStaticMesh* GetRandomSideMesh() const;
 
+	UPROPERTY()
+	FTimerHandle TestTimer;
+	
+	UFUNCTION()
+	void DestroyChildActors();
+	
+
 public:
 	
 	UFUNCTION(BlueprintCallable)
-	void DestroyFloorTile();
+	void PrepareNextTile();
 
 protected:
 	
@@ -75,9 +85,10 @@ protected:
 	virtual void BeginPlay() override;
 
 	void AddChildActor(AActor* ChildActor)  { ChildActors.Add(ChildActor); }
-
+	
 	FORCEINLINE USceneComponent* GetSceneComponent() const;
 	FORCEINLINE const TSubclassOf<ACoinItem>& GetCoinItemClass() const;
+	FORCEINLINE const TArray<UStaticMesh*>& GetFloorMeshes() const;
 	
 public:
 
