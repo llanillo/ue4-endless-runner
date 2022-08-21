@@ -22,7 +22,7 @@ $ git clone https://github.com/llanillo/GGJ-2022-Judgment-of-lost-souls
 ```
 
 ## Screenshots
-![Endless Runner - Unreal Engine 4](Screenshots/Idle.png)
+![Endless Runner - Unreal Engine 4](Screenshots/Idle_New.png)
 ![Endless Runner - Unreal Engine 4](Screenshots/Playing.png)
 
 ## Credits
