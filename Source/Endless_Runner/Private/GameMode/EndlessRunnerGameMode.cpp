@@ -5,7 +5,6 @@
 #include "Tiles/FloorTile.h"
 #include "Tiles/ObstacleTile.h"
 #include "Environment/Pool/ObjectPool.h"
-#include "Environment/Pool/PooledObject.h"
 #include "UI/GameHud.h"
 
 void AEndlessRunnerGameMode::BeginPlay()
@@ -24,15 +23,15 @@ void AEndlessRunnerGameMode::BeginPlay()
 
 	// Initialize the tiles pool and spawn the initial floor tiles
 	const FVector InitialPosition = FVector{-10000, -10000, -10000};
-	TilesPool->InitializePool(FTransform{InitialPosition});
+	// TilesPool->InitializePool(FTransform{InitialPosition});
 	CreateInitialFloorTiles(NumInitialFloorTiles);
 }
 
 AEndlessRunnerGameMode::AEndlessRunnerGameMode()
 {
 	// Creates and attach the pool object component
-	TilesPool = CreateDefaultSubobject<UObjectPool>(TEXT("Floor Tiles Pool"));
-	AddOwnedComponent(TilesPool);
+	// TilesPool = CreateDefaultSubobject<UObjectPool>(TEXT("Floor Tiles Pool"));
+	// AddOwnedComponent(TilesPool);
 }
 /*
  *	Spawn Initial Floor Tiles
@@ -55,17 +54,28 @@ void AEndlessRunnerGameMode::CreateInitialFloorTiles(int InitialFloorTiles)
 	}
 }
 
+void AEndlessRunnerGameMode::RemoveTile(AFloorTile* Tile)
+{
+	FloorTileArray.Remove(Tile);
+}
+
 /*
  *	Spawn a floor tile in the next spawn point and move it to the next location
  */
 AObstacleTile* AEndlessRunnerGameMode::AddFloorTile(bool SpawnItems)
 {
-	if (GetWorld())
+	UWorld* World = GetWorld();
+	
+	if (World)
 	{
-		AObstacleTile* Tile = Cast<AObstacleTile>(TilesPool->SpawnPooledObject(NextSpawnPoint));
+		// AObstacleTile* Tile = Cast<AObstacleTile>(TilesPool->SpawnPooledObject(NextSpawnPoint));
+		AObstacleTile* Tile = World->SpawnActor<AObstacleTile>(FloorTileClass, NextSpawnPoint);
+		// Tile->SetLifeSpan(TileLifeSpan);
 		
 		if (Tile)
 		{
+			FloorTileArray.Add(Tile);
+			
 			if(SpawnItems)
 			{
 				Tile->SpawnItems();
@@ -115,22 +125,30 @@ void AEndlessRunnerGameMode::PlayerDied()
 
 	if(CurrentLives > 0)
 	{
-		NextSpawnPoint = FTransform();
-		
-		for(int i = 0; i < TilesPool->GetPoolSize(); i++)
+		for(auto Tile : FloorTileArray)
 		{
-			APooledObject* PooledObject = Cast<AObstacleTile>(TilesPool->SpawnPooledObject(NextSpawnPoint));
-
-			if(IsValid(PooledObject))
-			{
-				AObstacleTile* const FloorTile = Cast<AObstacleTile>(PooledObject);
-				FloorTile->PrepareNextTile();
-			}
+			Tile->DestroyFloorTile();
 		}
-		
-		// FloorTiles.Empty();
-		NextSpawnPoint = FTransform();
+
+		FloorTileArray.Empty();
+		NextSpawnPoint = FTransform{};
+
 		CreateInitialFloorTiles(NumInitialFloorTiles);
+		// NextSpawnPoint = FTransform();
+		//
+		// for(int i = 0; i < TilesPool->GetPoolSize(); i++)
+		// {
+		// 	if(APooledObject* PooledObject = Cast<AObstacleTile>(TilesPool->SpawnPooledObject(NextSpawnPoint)); IsValid(PooledObject))
+		// 	{
+		// 		AObstacleTile* const FloorTile = Cast<AObstacleTile>(PooledObject);
+		// 		FloorTile->PrepareNextTile(); 
+		// 		// AddFloorTile(true);
+		// 	}
+		// }
+		//
+		// // FloorTiles.Empty();
+		// NextSpawnPoint = FTransform();
+		// CreateInitialFloorTiles(NumInitialFloorTiles);
 		OnLevelReset.Broadcast();
 	}
 	else

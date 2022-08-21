@@ -25,8 +25,8 @@ class ENDLESS_RUNNER_API AEndlessRunnerGameMode : public AGameModeBase
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USceneComponent* SceneComponent;
 
-	UPROPERTY(VisibleAnywhere, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	UObjectPool* TilesPool;
+	// UPROPERTY(VisibleAnywhere, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	// UObjectPool* TilesPool;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, NoClear, Category = "Config", meta = (AllowPrivateAccess = "true"))
 	int32 NumInitialFloorTiles = 10;
@@ -36,12 +36,18 @@ class ENDLESS_RUNNER_API AEndlessRunnerGameMode : public AGameModeBase
 
 	UPROPERTY(EditAnywhere, Category = "Widget")
 	TSubclassOf<UUserWidget> GameOverClass;
+
+	UPROPERTY(EditAnywhere, Category = "Runtime")
+	TSubclassOf<AObstacleTile> FloorTileClass;
 	
 	UPROPERTY(VisibleInstanceOnly, Category = "Widget")
 	UGameHud* GameHud;
 	
 	UPROPERTY(VisibleInstanceOnly, Category = "Runtime")
 	TArray<float> LaneSwitchValues;
+
+	UPROPERTY(VisibleInstanceOnly, Category = "Runtime")
+	TArray<AFloorTile*> FloorTileArray;
 	
 	UPROPERTY(VisibleInstanceOnly, Category = "Runtime")
 	FTransform NextSpawnPoint {};
@@ -54,14 +60,21 @@ class ENDLESS_RUNNER_API AEndlessRunnerGameMode : public AGameModeBase
 
 	UPROPERTY(EditAnywhere, Category = "Player")
 	int32 MaxLives = 3;
+
+	UPROPERTY(EditAnywhere, Category = "RunTime")
+	float TileLifeSpan = 2.0f;
 	
 	UFUNCTION(BlueprintCallable, Category = "Runtime")
 	void CreateInitialFloorTiles(int InitialFloorTiles);
+
 
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "Runtime")
 	AObstacleTile* AddFloorTile(bool SpawnItems);
+	
+	UFUNCTION(BlueprintCallable)
+	void RemoveTile(AFloorTile* Tile);
 	
 	UFUNCTION(BlueprintCallable, Category = "Player")
 	void AddCoin();

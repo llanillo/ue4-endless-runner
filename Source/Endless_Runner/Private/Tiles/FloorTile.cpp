@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "Tiles/FloorTile.h"
 #include "Collectables/CoinItem.h"
 #include "Components/ArrowComponent.h"
@@ -81,14 +79,16 @@ void AFloorTile::OnTriggerBoxOverlap(UPrimitiveComponent* OverlappedComponent, A
 {
 	if (Cast<APlayerBase>(OtherActor))
 	{
-		GetWorldTimerManager().SetTimer(GetLifeSpanTimer(), this, &AFloorTile::PrepareNextTile, GetLifeSpan(), false);
+		// GetWorldTimerManager().SetTimer(GetLifeSpanTimer(), this, &AFloorTile::PrepareNextTile, GetLifeSpan(), false);
+		MainGameMode->AddFloorTile(true);
+		// UE_LOG(LogTemp, Warning, TEXT("%d"), GetLifeSpan());
+		GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &AFloorTile::DestroyFloorTile, LifeSpan, false);
 	}
 }
 
 UStaticMesh* AFloorTile::GetRandomSideMesh() const
 {
-	const int32 ArraySize = SideTileMeshes.Num();
-	if(ArraySize > 0)
+	if(const int32 ArraySize = SideTileMeshes.Num(); ArraySize > 0)
 	{
 		const int32 RandValue = FMath::RandRange(0, ArraySize - 1);
 		return SideTileMeshes[RandValue];
@@ -109,14 +109,26 @@ void AFloorTile::DestroyChildActors()
 	ChildActors.Empty();
 }
 
-void AFloorTile::PrepareNextTile()
+// void AFloorTile::PrepareNextTile()
+// {
+// 	if(GetLifeSpanTimer().IsValid())
+// 	{
+// 		GetWorldTimerManager().ClearTimer(GetLifeSpanTimer());
+// 	}
+//
+// 	DestroyChildActors();
+// 	SetActorHiddenInGame(true);
+// 	MainGameMode->AddFloorTile(true);
+// }
+
+void AFloorTile::DestroyFloorTile()
 {
-	if(GetLifeSpanTimer().IsValid())
+	if(DestroyTimerHandle.IsValid())
 	{
-		GetWorldTimerManager().ClearTimer(GetLifeSpanTimer());
+		GetWorldTimerManager().ClearTimer(DestroyTimerHandle);
 	}
 
 	DestroyChildActors();
-	SetActorHiddenInGame(true);
-	MainGameMode->AddFloorTile(true);
+	MainGameMode->RemoveTile(this);
+	this->Destroy();
 }

@@ -15,7 +15,7 @@ class AEndlessRunnerGameMode;
 class UArrowComponent;
 
 UCLASS()
-class ENDLESS_RUNNER_API AFloorTile : public APooledObject
+class ENDLESS_RUNNER_API AFloorTile : public AActor
 {
 	GENERATED_BODY()
 	
@@ -46,7 +46,7 @@ class ENDLESS_RUNNER_API AFloorTile : public APooledObject
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* LeftSideMesh;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Componentes", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* RightSideMesh;
 	
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config", meta = (AllowPrivateAccess = "true"))
@@ -68,16 +68,23 @@ class ENDLESS_RUNNER_API AFloorTile : public APooledObject
 	UStaticMesh* GetRandomSideMesh() const;
 
 	UPROPERTY()
-	FTimerHandle TestTimer;
+	FTimerHandle DestroyTimerHandle;
+
+	UPROPERTY()
+	float LifeSpan = 2.0f;
 	
 	UFUNCTION()
 	void DestroyChildActors();
-	
 
 public:
-	
+	// virtual void SetLifeSpan(float InLifespan) override;
+
+
+	// UFUNCTION(BlueprintCallable)
+	// void PrepareNextTile();
+
 	UFUNCTION(BlueprintCallable)
-	void PrepareNextTile();
+	void DestroyFloorTile();
 
 protected:
 	

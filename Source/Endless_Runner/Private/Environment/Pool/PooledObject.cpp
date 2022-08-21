@@ -14,7 +14,7 @@ APooledObject::APooledObject()
 	
 }
 
-void APooledObject::SetLifeSpan(float InLifespan)
+void APooledObject::SetLifeSpan(const float InLifespan)
 {
 	LifeSpan = InLifespan;
 }
