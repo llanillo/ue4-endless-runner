@@ -1,8 +1,8 @@
-# Endless Runner Game
+Endless Runner Game - Unreal Engine 4 (C++)
 
 ## Description
 
-Third person endless runner for **Unreal Engine 4** made with C++ and blueprints. Currently in development.
+Third person endless runner built with **Unreal Engine 4** using  C++ and blueprints. Navigate through an endless terrain while dodging obstacles and collecting power-ups to achieve the highest score possible. With stunning visuals and smooth gameplay mechanics.
 
 ## Installation
 
